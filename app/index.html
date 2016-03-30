@@ -7,7 +7,7 @@
         <meta name="description" content="search tweets based on your geolocation">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>twitter-locator-app</title>
-        
+
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
         <link rel="shortcut icon" href="/favicon.ico">
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -18,6 +18,8 @@
         <!-- endbuild -->
         <!-- build:css(.tmp) styles/main.css -->
         <link rel="stylesheet" href="styles/main.css">
+        <script src="bower_components/oauthio-web/dist/oauth.js"></script>
+
         <!-- endbuild -->
     </head>
     <body>
@@ -27,43 +29,33 @@
 
 
         <div class="container">
-            <div class="header">
-                <a href="404.html">404 Page</a>
-            </div><!-- .header -->
+            <header>
+            </header>
 
-            <div class="main">
-                <h1>Congratulations!</h1>
-                <p>The <code>bourbon-neat</code> generator has given you...</p>
-                <h3><a href="https://html5boilerplate.com/" title="The web’s most popular front-end template" target="_blank">HTML5 Boilerplate</a></h3>
-                <p>HTML5 Boilerplate is a professional front-end template for building fast, robust, and adaptable web apps or sites.</p>
+            <main>
+              <button id="logIn" class="btn" onclick="login()">Log in</button>
 
-                <h3><a href="http://sass-lang.com/" title="CSS with superpowers" target="_blank">Sass</a></h3>
-                <p>Sass is a mature, stable, and powerful professional grade CSS extension language.</p>
+              <div id="appLoggedIn" class="hidden">
+                <button class="btn" onclick="logout()">Log out</button>
 
-                <h3><a href="http://bourbon.io/" title="thoughtbot: Bourbon Saas mixin library" target="_blank">Bourbon</a></h3>
-                <p>A simple and lightweight mixin library for Sass.</p>
+                <button class="btn" onclick="geoFindMe()">Show my location</button>
+                <div id="out"></div>
+                <label for="fader">Distance Range (miles)</label>
+                <input type="range" min="0" max="10" value="5" id="fader" step=".25" oninput="outputUpdate(value)">
+                <output for="fader" id="volume">5</output>
+              </div>
+            </main><!-- main -->
 
-                <h3><a href="http://neat.bourbon.io/" title="thoughtbot: Neat responsive grid" target="_blank">Neat</a></h3>
-                <p>Sleek, intuitive, and powerful mobile first front-end framework (Grid) for faster and easier web development.</p>
-
-                <h3><a href="http://necolas.github.io/normalize.css/" title="Normalize CSS" target="_blank">Normalize.css</a></h3>
-                <p>A modern, HTML5-ready alternative to CSS resets. Makes browsers render all elements more consistently and in line with modern standards.</p>
-                
-
-                
-
-                <p>Happy coding!</p>
-            </div><!-- .main -->
-            
         </div><!-- .container -->
 
-        <div class="footer">
-            Brought to you by the brilliant people at <a href="http://koolth.com.au">koolth</a>
-        </div><!-- .footer -->
+        <footer>
+        </footer>
 
         <!-- build:js scripts/vendor.js -->
         <!-- bower:js -->
         <script src="../bower_components/jquery/dist/jquery.js"></script>
+        <script src="scripts/main.js"></script>
+
         <!-- endbower -->
         <!-- endbuild -->
 
