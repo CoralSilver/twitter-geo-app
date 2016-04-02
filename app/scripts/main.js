@@ -20,13 +20,32 @@ function logout(){
 }
 
 function getTweetsByLocation(lat, lon, miles){
-  miles = miles || 5;
-
+  var miles = $('#volume').val();
+  //miles = miles || 2;
   var apiEndpoint = 'https://api.twitter.com/1.1/search/tweets.json?count=50&geocode=';
   apiEndpoint += lat + ',' + lon + ',' + miles + 'mi';
+  console.log(miles + ' miles');
+  twitterRequestor.get(apiEndpoint).done(function(data, media_url) {
+    console.log(data);
+    var $locatedTweets = $('#locatedTweets');
+    for(var i = 0; i < data.statuses.length; i++) {
+      var tweets = '<p>'+ urlify(data.statuses[i].text) + '</p>';
+      var screenName = '<span class="user-name"><a href="'+ 'https://twitter.com/' + data.statuses[i].user.screen_name + '" ' + 'target="_blank"' + '>' + data.statuses[i].user.screen_name + '</a></span>';
+      var profileImageUrl = '<img src = "' + data.statuses[i].user.profile_image_url + '" class = "profile-image">';
+      //console.log(media_url);
+      console.log(data.statuses[i].entities)
 
-  twitterRequestor.get(apiEndpoint).done(function(data) {
-    console.info(data);
+      if (data.statuses[i].entities.hasOwnProperty("media")){
+        var tweetImage = '<img src = "' + data.statuses[i].entities.media[0].media_url + '">';
+        var fullTweet = '<div class="tweet-container">' + profileImageUrl + screenName + tweets + tweetImage + '</div>';
+      } else {
+        var fullTweet = '<div class="tweet-container">' + profileImageUrl + screenName + tweets +'</div>';
+      }
+
+
+      $locatedTweets.append(fullTweet);
+    }
+
   }).fail(function(err) {
     console.warn(err);
   });
@@ -48,10 +67,10 @@ function geoFindMe() {
 }
 
 
-function success(position) {
+function success(position) {  //position is automatically returned?
   var latitude  = position.coords.latitude;
   var longitude = position.coords.longitude;
-  getTweetsByLocation(latitude, longitude, outputUpdate());
+  getTweetsByLocation(latitude, longitude);
 
   $output.html('<p>Latitude is ' + latitude + '° <br>Longitude is ' + longitude + '°</p>');
 
@@ -69,6 +88,21 @@ function error() {
 function outputUpdate(vol) {
 	$('#volume').val(vol);
 }
+
+function urlify(text) {
+    var twitterUrlRegex = /(https?:\/+t.co\/[^\s]+)/g;
+    return text.replace(twitterUrlRegex, function(url) {
+        return '<a href="' + url + '" ' + 'target="_blank">' + url + '</a>';
+    })
+    // or alternatively
+    // return text.replace(urlRegex, '<a href="$1">$1</a>')
+}
+
+// var text = "Find me at http://www.example.com and also at http://stackoverflow.com";
+// var html = urlify(text);
+
+// html now looks like:
+// "Find me at <a href="http://www.example.com">http://www.example.com</a> and also at <a href="http://stackoverflow.com">http://stackoverflow.com</a>"
 
 
 
