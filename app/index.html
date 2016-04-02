@@ -41,8 +41,11 @@
                 <button class="btn" onclick="geoFindMe()">Show my location</button>
                 <div id="out"></div>
                 <label for="fader">Distance Range (miles)</label>
-                <input type="range" min="0" max="10" value="5" id="fader" step=".25" oninput="outputUpdate(value)">
-                <output for="fader" id="volume">5</output>
+                <input type="range" min="0" max="10" value="1" id="fader" step=".05" oninput="outputUpdate(value)">
+                <output for="fader" id="volume">1</output>
+                <div id="locatedTweets"></div>
+
+                </div>
               </div>
             </main><!-- main -->
 

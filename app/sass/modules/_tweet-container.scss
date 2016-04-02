@@ -1,0 +1,16 @@
+.tweet-container {
+  background-color: $white;
+  border: $base-border;
+  border-radius: $base-border-radius;
+  margin: $small-spacing/2 0;
+  padding: $small-spacing;
+  .profile-image {
+    border-radius: 50%;
+    border: 2px solid $light-gray;
+    float: left;
+    margin-right: $small-spacing;
+  }
+  .user-name {
+    font-weight: bold;
+  }
+}

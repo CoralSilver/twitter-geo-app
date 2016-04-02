@@ -2,7 +2,10 @@
 @import 'bourbon';
 @import 'neat';
 @import "base/base";
-@import 'helpers/visibility'
+@import 'helpers/visibility';
+@import 'elements/images';
+@import 'layout/containers';
+@import 'modules/tweet-container';
 // endbower
 
 // $linkColor: #4183C4;
