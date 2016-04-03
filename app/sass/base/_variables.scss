@@ -1,5 +1,6 @@
 // Typography
-$base-font-family: $helvetica;
+//$base-font-family: $helvetica;
+$base-font-family: 'Open Sans', sans-serif;
 $heading-font-family: $base-font-family;
 
 // Font Sizes
@@ -16,10 +17,11 @@ $small-spacing: $base-spacing / 2;
 $base-z-index: 0;
 
 // Colors
-$white: #F8F8F8;
-$blue: #477dca;
-$teal: #6C9CA0;
-$dark-gray: #333;
+$white: #FDFBFB;
+$blue: #6992AE;
+//$teal: #6C9CA0;
+$teal: #489096;
+$dark-gray: #4D4D4D;
 $medium-gray: #999;
 $light-gray: #ddd;
 $lighest-gray: #F1F1F1;

@@ -1,0 +1,17 @@
+.distance-range {
+  // border: $base-border;
+  // border-radius: $base-border-radius;
+  color: $medium-gray;
+  font-size: em(14);
+  margin: 0 $small-spacing;
+  padding: 0 $small-spacing;
+  position: relative;
+  output {
+    position: absolute;
+    right: 5px;
+    bottom: 0;
+  }
+  label {
+    margin-bottom: 0.25em;
+  }
+}

@@ -1,0 +1,18 @@
+.login-container {
+  background-color: $white;
+  border:$base-border;
+  border-radius: $base-border-radius;
+  width: 320px;
+  padding: $base-spacing;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  .image-container {
+    background: url('../images/location-marker.png') top center no-repeat;
+    height: 300px;
+  }
+  button {
+    width: 100%;
+  }
+}

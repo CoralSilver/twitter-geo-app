@@ -1,0 +1,14 @@
+//animation
+@keyframes spinning-icon {
+    0% {transform: rotate(5deg);}
+    20% {transform: rotate(60deg)}
+    40% {transform: rotate(-60deg)}
+    60% {transform: rotate(0deg)}
+    80% {transform: rotate(30deg)}
+    100% {transform: rotate(20deg)}
+}
+
+.loading-icon {
+  animation-name: spinning-icon;
+  animation-duration: 4s;
+}
