@@ -1,14 +1,28 @@
 //animation
 @keyframes spinning-icon {
-    0% {transform: rotate(5deg);}
-    20% {transform: rotate(60deg)}
-    40% {transform: rotate(-60deg)}
-    60% {transform: rotate(0deg)}
-    80% {transform: rotate(30deg)}
-    100% {transform: rotate(20deg)}
+    0% {transform: translate(-50%, -50%) rotate(5deg);}
+    20% {transform: translate(-50%, -50%) rotate(60deg)}
+    40% {transform: translate(-50%, -50%) rotate(-60deg)}
+    60% {transform: translate(-50%, -50%) rotate(0deg)}
+    80% {transform: translate(-50%, -50%) rotate(30deg)}
+    100% {transform: translate(-50%, -50%) rotate(20deg)}
 }
 
-.loading-icon {
-  animation-name: spinning-icon;
-  animation-duration: 4s;
+.loading {
+  //@include span-columns(9);
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  &-icon {
+    animation-name: spinning-icon;
+    animation-duration: 6s;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    //transform: translate(-50%, -50%) ;
+  }
 }
