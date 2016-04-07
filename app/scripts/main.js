@@ -29,98 +29,6 @@ function login(){
   });
 }
 
-function logout(){
-  OAuth.clearCache('twitter');
-  locationObj = {};
-  currentUser = {};
-  $('.header, #appLoggedIn').addClass('hidden')
-  var $loggedInContainer = $('#appLoggedIn')
-  $loggedInContainer.find('#out').html('');
-  $loggedInContainer.find('#locatedTweets').html('');
-  $('#savedSearches').html('');
-  $('.login-container').removeClass('hidden');
-}
-
-function retreiveSavedData(lastChildKey) {
-  var locRef = fireb.child('users').child(currentUser.id).child(lastChildKey);
-  locRef.on("value", function(snapshot) {
-    var snapshot = snapshot.val();
-    var data = Object.keys(snapshot).map(function(key){
-      return snapshot[key]
-    });
-
-    console.log(data);
-
-    if (lastChildKey === 'location' ) {
-      buildSavedLocations(data);
-    } else {
-       parseTweetData(data, $savedTweets);
-    }
-  }, function (errorObject) {
-    console.log("The read failed: " + errorObject.code);
-  });
-}
-
-function buildSavedLocations(locations) {
-  var savedLocationContainer = $('<div class="saved-location"></div>');
-  for(var i=0; i<locations.length; i++) {
-    var containingDiv = $('<div class="saved-location-inner-container"></div>');
-    var savedLocationName = '<h3>' + locations[i].name + '</h3>'
-    var savedLat = '<p>Latitude: ' + locations[i].longitude + '</p>'
-    var savedLong = '<p>Longitude: ' + locations[i].latitude + '</p>'
-    var savedMiles = '<p>Distance Range: ' + locations[i].miles + '</p>'
-    var button = '<button type="button" class="btn saved-search-button">Search</button>';
-    savedLocationContainer.append(savedLocationName + savedLat + savedLong + savedMiles + button);
-    containingDiv.append(savedLocationContainer);
-  }
-  $('#savedSearches').html(containingDiv);
-}
-
-function getTweetsByLocation(lat, lon, miles){
-  miles = $('#volume').val();
-  var apiEndpoint = 'https://api.twitter.com/1.1/search/tweets.json?count=50&geocode=';
-  apiEndpoint += lat + ',' + lon + ',' + miles + 'mi';
-
-  locationObj = {
-  latitude: lat,
-  longitude: lon,
-  miles:miles
-  };
-
-  twitterRequestor.get(apiEndpoint).done(function(data, media_url) {
-    parseTweetData(data.statuses, $locatedTweets);
-    console.log('tweet', data.statuses);
-  }).fail(function(err) {
-    console.warn(err);
-  });
-}
-
-
-function parseTweetData(data, divToAppend) {
-  console.log(data);
-
-  for(var i = 0; i < data.length; i++) {
-    var tweets = '<p>'+ urlify(data[i].text) + '</p>';
-    var screenName = '<span class="user-name"><a href="'+ 'https://twitter.com/' + data[i].user.screen_name + '" ' + 'target="_blank"' + '>' + data[i].user.screen_name + '</a></span>';
-    var createdDate = (new Date(data[i].created_at));
-    //convert to relative time
-    var relativeDate = moment(createdDate).fromNow();
-    var dateElm = '<span class="date">'+ relativeDate +'</span>';
-    screenName += dateElm;
-    var profileImageUrl = '<img src = "' + data[i].user.profile_image_url + '" class = "profile-image">';
-
-    if (data[i].entities.hasOwnProperty("media")){
-      var tweetImage = '<img src = "' + data[i].entities.media[0].media_url + '" class="media-image">';
-      var $fullTweet = $('<div class="tweet-container">' + profileImageUrl + screenName + tweets + tweetImage + '<i class="material-icons heart">favorite</i>' + '</div>');
-    } else {
-      var $fullTweet = $('<div class="tweet-container">' + profileImageUrl + screenName + tweets + '<i class="material-icons heart">favorite</i>' + '</div>');
-    }
-
-    $fullTweet.data('twitter-message-obj', data[i]);
-    divToAppend.append($fullTweet);
-
-  }
-}
 
 function loggedIn() {
   $('#appLoggedIn, header').removeClass('hidden');
@@ -133,7 +41,7 @@ function geoFindMe() {
     return;
   }
 
-  $outputLocationData.html('<img src="../images/arrow.png" class="loading-icon">');
+  $outputLocationData.html('<div class="loading"><img src="../images/arrow.png" class="loading-icon"></div>');
   navigator.geolocation.getCurrentPosition(success, error);
 }
 
@@ -158,6 +66,120 @@ function buildResults(latitude, longitude){
 $(document).on('click', '#show-tweets-button', function() {
   geoFindMe();
 });
+
+function logout(){
+  OAuth.clearCache('twitter');
+  locationObj = {};
+  currentUser = {};
+  $('.header, #appLoggedIn').addClass('hidden')
+  var $loggedInContainer = $('#appLoggedIn')
+  $loggedInContainer.find('#out').html('');
+  $loggedInContainer.find('#locatedTweets').html('');
+  $('#savedSearches').html('');
+  $('.login-container').removeClass('hidden');
+}
+
+//function to retrieve saved locations and tweets
+function retreiveSavedData(lastChildKey) {
+  var locRef = fireb.child('users').child(currentUser.id).child(lastChildKey);
+  locRef.on("value", function(snapshot) {
+    var snapshot = snapshot.val();
+    var data = Object.keys(snapshot).map(function(key){
+      return snapshot[key]
+    });
+
+    if (lastChildKey === 'location' ) {
+      buildSavedLocations(data);
+    } else {
+       parseTweetData(data, $savedTweets); //appending to already added tweets on every value change
+       $('#favorited-tweets .heart').addClass('heart-favorited'); //make this only happen once
+    }
+  }, function (errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });
+}
+
+function buildSavedLocations(locations) {
+  var savedLocationContainer = $('<div class="saved-location"></div>');
+
+  for(var i=0; i<locations.length; i++) {
+    var clearButton = '<button role="button" class="button-unstyled button-clear-icon"><i class="material-icons">clear</i></button>';
+    var savedLocationName = '<h3>' + locations[i].name + '</h3>'
+    var savedLat = locations[i].latitude;
+    var savedLatElem = '<span>Latitude: ' + savedLat + '</span></br>';
+    var savedLong = locations[i].longitude;
+    var savedLongElem = '<span>Longitude: ' + savedLong + '</span></br>';
+    var savedMiles = locations[i].miles;
+    var savedMilesElem = '<span>Distance Range: ' + savedMiles + ' mi.</span></br>';
+    var button = '<button type="button" class="button-small saved-search-button float-right">Search</button>';
+    var innerContainer = $('<div class="saved-location-inner-container"></div>');
+    innerContainer.attr({
+      'data-lat': savedLat,
+      'data-long': savedLong,
+      'data-miles': savedMiles
+    }).append(clearButton + savedLocationName + savedLatElem + savedLongElem + savedMilesElem + button);
+    savedLocationContainer.append(innerContainer);
+  }
+  $('#savedSearches').html(savedLocationContainer);
+}
+
+function getTweetsByLocation(lat, lon, miles){
+  miles = $('#volume').val();
+  var apiEndpoint = 'https://api.twitter.com/1.1/search/tweets.json?count=50&geocode=';
+  apiEndpoint += lat + ',' + lon + ',' + miles + 'mi';
+  locationObj = {
+  latitude: lat,
+  longitude: lon,
+  miles:miles
+  };
+
+  twitterRequestor.get(apiEndpoint).done(function(data, media_url) {
+    parseTweetData(data.statuses, $locatedTweets);
+    console.log('tweet', data.statuses);
+  }).fail(function(err) {
+    console.warn(err);
+  });
+}
+
+
+function parseTweetData(data, divToAppend) {
+  divToAppend.html('');
+
+  for(var i = 0; i < data.length; i++) {
+    var tweets = '<p>'+ urlify(data[i].text) + '</p>';
+    var screenName = '<span class="user-name"><a href="'+ 'https://twitter.com/' + data[i].user.screen_name + '" ' + 'target="_blank"' + '>' + data[i].user.screen_name + '</a></span>';
+    var createdDate = (new Date(data[i].created_at));
+    //convert to relative time
+    var relativeDate = moment(createdDate).fromNow();
+    var dateElm = '<span class="date">'+ relativeDate +'</span>';
+    screenName += dateElm;
+    var profileImageUrl = '<img src = "' + data[i].user.profile_image_url + '" class = "profile-image">';
+
+    if (data[i].entities.hasOwnProperty("media")){
+      var tweetImage = '<img src = "' + data[i].entities.media[0].media_url + '" class="media-image">';
+      var $fullTweet = $('<div class="tweet-container">' + profileImageUrl + screenName + tweets + tweetImage + '<i class="material-icons heart">favorite</i>' + '</div>');
+    } else {
+      var $fullTweet = $('<div class="tweet-container">' + profileImageUrl + screenName + tweets + '<i class="material-icons heart">favorite</i>' + '</div>');
+    }
+
+    $fullTweet.data('twitter-message-obj', data[i]);  //add Twitter object as data to be retreived later
+    divToAppend.append($fullTweet);
+  }
+}
+
+$(document).on('click', '#saved-tweets .heart-favorited, .button-clear-icon', function() {
+  $(this).parent('div').fadeOut('slow').detach();
+});
+
+
+$(document).on('click', '.saved-search-button', function() {
+  var lat = $(this).parent('div').data('lat');
+  var lon = $(this).parent('div').data('long');
+  var miles = $(this).parent('div').data('miles');
+  console.log(lat, lon, miles);
+  getTweetsByLocation(lat, lon, miles);
+});
+
 
 function buildForm() {
   var $form = $('<form></form>');
@@ -186,17 +208,16 @@ function urlify(text) {
 function saveSearchLocation() {
   $(document).on('click','#saveSearch',function(e){
     e.preventDefault();
-    var locationInput = $('#location-input')
+    var locationInput = $('#location-input');
     var locationName = locationInput.val();
     locationObj.name = locationName;
+    //.child(locationName) sets locations alphabetically, not in order they are added
     fireb.child('users').child(currentUser.id).child('location').child(locationName).set(locationObj);
     locationInput.val('');
   })
 }
 
 saveSearchLocation();
-
-
 
 function favorite() {
   $(document).on('click','.heart',function(){
@@ -222,7 +243,9 @@ $(document).on('click','.heart',function(){
   theHeart.toggleClass('heart-favorited');
   console.log(tweetObj);
   if (theHeart.hasClass('heart-favorited') ) {
-    //save
+    //This saves thems by object id_string key so they can be referenced and removed
+    //They are order in Firebase alphabetically by id_string not order of addition
+    //When reassembling saved tweets should sort them by date?
     fireb.child('users').child(currentUser.id).child('tweets').child(tweetObj.id_str).set(tweetObj);
   } else {
     console.log('unfavorited');
