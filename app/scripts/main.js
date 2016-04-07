@@ -1,7 +1,10 @@
 OAuth.initialize('7bIgDNbrQL4S2mH034k8dO4KxBE');
 var twitterRequestor;
 var currentUser;
-var $output = $("#out");
+var $outputLocationData = $("#output-location-data");
+var $outputMap = $("#output-map");
+var $locatedTweets = $('#locatedTweets');
+var $savedTweets = $('#favorited-tweets');
 var locationObj = {};
 
 //Create Firebase
@@ -10,9 +13,15 @@ var fireb = new Firebase('https://coralsilver.firebaseio.com/');
 function login(){
   OAuth.popup('twitter', {cache: true}).done(function(result) {
     twitterRequestor = result;
-    twitterRequestor.me().then(function(profile){
+    twitterRequestor.me().then(function(profile, lastChildKey, data){
       currentUser = profile;
-      retreiveSavedLocations();
+      retreiveSavedData('location');
+      retreiveSavedData('tweets');
+      // if (lastChildKey === 'location' ) {
+      //   buildSavedLocations(data);
+      // } else {
+      //    parseTweetData(data, $savedTweets);
+      // }
     })
     loggedIn();
   }).fail(function (err) {
@@ -32,76 +41,85 @@ function logout(){
   $('.login-container').removeClass('hidden');
 }
 
-function retreiveSavedLocations() {
-  var locRef = fireb.child('users').child(currentUser.id).child('location');
+function retreiveSavedData(lastChildKey) {
+  var locRef = fireb.child('users').child(currentUser.id).child(lastChildKey);
   locRef.on("value", function(snapshot) {
     var snapshot = snapshot.val();
-    var locations = Object.keys(snapshot).map(function(key){
+    var data = Object.keys(snapshot).map(function(key){
       return snapshot[key]
     });
-    console.log(locations);
-    buildSavedLocations(locations);
+
+    console.log(data);
+
+    if (lastChildKey === 'location' ) {
+      buildSavedLocations(data);
+    } else {
+       parseTweetData(data, $savedTweets);
+    }
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);
   });
-
 }
 
 function buildSavedLocations(locations) {
   var savedLocationContainer = $('<div class="saved-location"></div>');
   for(var i=0; i<locations.length; i++) {
+    var containingDiv = $('<div class="saved-location-inner-container"></div>');
     var savedLocationName = '<h3>' + locations[i].name + '</h3>'
     var savedLat = '<p>Latitude: ' + locations[i].longitude + '</p>'
     var savedLong = '<p>Longitude: ' + locations[i].latitude + '</p>'
     var savedMiles = '<p>Distance Range: ' + locations[i].miles + '</p>'
-    savedLocationContainer.append(savedLocationName + savedLat + savedLong + savedMiles);
-
+    var button = '<button type="button" class="btn saved-search-button">Search</button>';
+    savedLocationContainer.append(savedLocationName + savedLat + savedLong + savedMiles + button);
+    containingDiv.append(savedLocationContainer);
   }
-  $('#savedSearches').html(savedLocationContainer);
+  $('#savedSearches').html(containingDiv);
 }
 
 function getTweetsByLocation(lat, lon, miles){
   miles = $('#volume').val();
-  //miles = miles || 2;
   var apiEndpoint = 'https://api.twitter.com/1.1/search/tweets.json?count=50&geocode=';
   apiEndpoint += lat + ',' + lon + ',' + miles + 'mi';
+
   locationObj = {
-    latitude: lat,
-    longitude: lon,
-    miles:miles
+  latitude: lat,
+  longitude: lon,
+  miles:miles
   };
-  console.log(apiEndpoint);
-  //console.log(miles + ' miles');
+
   twitterRequestor.get(apiEndpoint).done(function(data, media_url) {
-    //console.log(data);
-    var $locatedTweets = $('#locatedTweets');
-    for(var i = 0; i < data.statuses.length; i++) {
-      var tweets = '<p>'+ urlify(data.statuses[i].text) + '</p>';
-      var screenName = '<span class="user-name"><a href="'+ 'https://twitter.com/' + data.statuses[i].user.screen_name + '" ' + 'target="_blank"' + '>' + data.statuses[i].user.screen_name + '</a></span>';
-      var createdDate = (new Date(data.statuses[i].created_at));
-      //convert to relative time
-      var relativeDate = moment(createdDate).fromNow();
-      var dateElm = '<span>'+ relativeDate +'</span>';
-      screenName += dateElm;
-      var profileImageUrl = '<img src = "' + data.statuses[i].user.profile_image_url + '" class = "profile-image">';
-      //console.log(media_url);
-      console.log(data);
-
-      if (data.statuses[i].entities.hasOwnProperty("media")){
-        var tweetImage = '<img src = "' + data.statuses[i].entities.media[0].media_url + '" class="media-image">';
-        var $fullTweet = $('<div class="tweet-container">' + profileImageUrl + screenName + tweets + tweetImage + '<i class="material-icons heart">favorite</i>' + '</div>');
-      } else {
-        var $fullTweet = $('<div class="tweet-container">' + profileImageUrl + screenName + tweets + '<i class="material-icons heart">favorite</i>' + '</div>');
-      }
-
-      $fullTweet.data('twitter-message-obj', data.statuses[i]);
-      //console.log(data.statuses[i])
-      $locatedTweets.append($fullTweet);
-    }
-
+    parseTweetData(data.statuses, $locatedTweets);
+    console.log('tweet', data.statuses);
   }).fail(function(err) {
     console.warn(err);
   });
+}
+
+
+function parseTweetData(data, divToAppend) {
+  console.log(data);
+
+  for(var i = 0; i < data.length; i++) {
+    var tweets = '<p>'+ urlify(data[i].text) + '</p>';
+    var screenName = '<span class="user-name"><a href="'+ 'https://twitter.com/' + data[i].user.screen_name + '" ' + 'target="_blank"' + '>' + data[i].user.screen_name + '</a></span>';
+    var createdDate = (new Date(data[i].created_at));
+    //convert to relative time
+    var relativeDate = moment(createdDate).fromNow();
+    var dateElm = '<span class="date">'+ relativeDate +'</span>';
+    screenName += dateElm;
+    var profileImageUrl = '<img src = "' + data[i].user.profile_image_url + '" class = "profile-image">';
+
+    if (data[i].entities.hasOwnProperty("media")){
+      var tweetImage = '<img src = "' + data[i].entities.media[0].media_url + '" class="media-image">';
+      var $fullTweet = $('<div class="tweet-container">' + profileImageUrl + screenName + tweets + tweetImage + '<i class="material-icons heart">favorite</i>' + '</div>');
+    } else {
+      var $fullTweet = $('<div class="tweet-container">' + profileImageUrl + screenName + tweets + '<i class="material-icons heart">favorite</i>' + '</div>');
+    }
+
+    $fullTweet.data('twitter-message-obj', data[i]);
+    divToAppend.append($fullTweet);
+
+  }
 }
 
 function loggedIn() {
@@ -111,37 +129,47 @@ function loggedIn() {
 
 function geoFindMe() {
   if (!navigator.geolocation){
-    $output.html("<p>Geolocation is not supported by your browser</p>");
+    $outputLocationData.html("<p>Geolocation is not supported by your browser</p>");
     return;
   }
 
-  $output.html('<img src="../images/arrow.png" class="loading-icon">');
+  $outputLocationData.html('<img src="../images/arrow.png" class="loading-icon">');
   navigator.geolocation.getCurrentPosition(success, error);
 }
 
 function success(position) {  //position is automatically returned?
-  latitude  = position.coords.latitude;
-  longitude = position.coords.longitude;
+  latitude  = position.coords.latitude.toFixed(5);
+  longitude = position.coords.longitude.toFixed(5);
   buildResults(latitude, longitude);
+  buildForm();
 }
 
 function buildResults(latitude, longitude){
   getTweetsByLocation(latitude, longitude);
-  var range = 14;
+  var zoom = 14;
 
-  $output.html('<p>Latitude is ' + latitude + '° <br>Longitude is ' + longitude + '°</p>');
+  $outputLocationData.html('<p>Latitude is ' + latitude + '° <br>Longitude is ' + longitude + '°</p>');
 
   var $img = new Image();
-  $img.src = "https://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=" + range + "&size=300x300&sensor=false";
+  $img.src = "https://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=" + zoom + "&size=500x200&sensor=false";
+  $outputMap.html($img)
+}
 
+$(document).on('click', '#show-tweets-button', function() {
+  geoFindMe();
+});
 
-  var $button =  $('<button id="saveSearch" class="btn">Save search location</button>');
+function buildForm() {
+  var $form = $('<form></form>');
+  var $input = '<input id="location-input" type="text" placeholder="Name this location">';
+  var $button =  '<button id="saveSearch" class="btn float-right">Save search location</button>';
 
-  $output.append($img).append($button);
+  var $assembledForm = $form.append($input + $button);
+  $outputLocationData.append($assembledForm);
 }
 
 function error() {
-  $output.html("Unable to retrieve your location");
+  $outputLocationData.html("Unable to retrieve your location");
 }
 
 function outputUpdate(vol) {
@@ -156,10 +184,13 @@ function urlify(text) {
 }
 
 function saveSearchLocation() {
-  $(document).on('click','#saveSearch',function(){
-    var locationName = prompt('What would you like to name this location?');
+  $(document).on('click','#saveSearch',function(e){
+    e.preventDefault();
+    var locationInput = $('#location-input')
+    var locationName = locationInput.val();
     locationObj.name = locationName;
     fireb.child('users').child(currentUser.id).child('location').child(locationName).set(locationObj);
+    locationInput.val('');
   })
 }
 
@@ -193,27 +224,26 @@ $(document).on('click','.heart',function(){
   if (theHeart.hasClass('heart-favorited') ) {
     //save
     fireb.child('users').child(currentUser.id).child('tweets').child(tweetObj.id_str).set(tweetObj);
-
-    // // Retrieve new posts as they are added to our database
-    // fireb.on("child_added", function(snapshot, prevKey) {
-    //   var newPost = snapshot.val();
-    //   console.log(newPost);
-    //   console.log(prevKey.val());
-    //   // console.log("URL: " + newPost.profileImgURL);
-    //   // console.log("Text: " + newPost.tweetText);
-    //   // console.log("Previous Post ID: " + prevChildKey);
-    // });
-
   } else {
     console.log('unfavorited');
     fireb.child('users').child(currentUser.id).child('tweets').child(tweetObj.id_str).remove();
   }
-// } else if ($(this).data( "favorited" ) === false){
-//       console.log('unfavorited');
-//       fireb.child('users').child('user_id').child('tweets').child(tweetObj.id_str).remove();
-//   }
-
 });
+
+function expandSection() {
+  $('.expander-trigger').click(function(){
+    var self = $(this);
+    self.toggleClass("expander-hidden");
+    if (self.children('i').text() === 'add') {
+      //alert('add');
+    } else {
+      //alert('remove');
+    }
+  });
+}
+
+expandSection();
+
 
 
 
