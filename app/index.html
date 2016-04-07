@@ -34,10 +34,10 @@
           <header class="header hidden">
             <div class="container">
               <img src="images/location-marker.png" alt="logo" class="logo"/>
-              <button class="btn float-left" onclick="geoFindMe()">Show tweets near me</button>
+              <button class="btn float-left" id="show-tweets-button">Show tweets near me</button>
               <div class="distance-range float-left">
                 <label for="fader">Distance Range (miles)</label>
-                <input type="range" min="0" max="10" value="1" id="fader" step=".05" oninput="outputUpdate(value)">
+                <input type="range" min="0" max="5" value="1" id="fader" step=".05" oninput="outputUpdate(value)">
                 <output for="fader" id="volume">1</output>
               </div>
               <button class="btn float-right" onclick="logout()">Log out</button>
@@ -55,20 +55,35 @@
 
             <div class="container">
               <div id="appLoggedIn" class="hidden">
-                <div class="section">
-                  <div id="map">
-                    <div id="out"></div>
+                <section class="section">
+
+                  <div class="grid-left">
+                    <div class="location-output">
+                      <div id="output-location-data"></div>
+                      <div id="output-map"></div>
+                    </div>
+                    <div id="locatedTweets"></div>
                   </div>
+
                   <div id="savedSearchContainer">
-                    <h2>Saved search locations:</h2>
-                    <div id="savedSearches">
+                    <div class="expander">
+                      <a href="javascript:void(0)" class="expander-trigger expander-hidden">
+                        <span><strong>Saved search locations</strong><i class="material-icons md-18 ">room</i></a></span>
+                      <div id="savedSearches" class="expander-content">
+                      </div>
+                    </div>
+                    <div class="expander">
+                      <a href="javascript:void(0)" class="expander-trigger expander-hidden">
+                        <span><strong>Favorited tweets</strong><i class="material-icons md-18  heart heart-favorited">favorite</i></a></span>
+                      <div id="favorited-tweets" class="expander-content">
+                      </div>
                     </div>
                   </div>
-                  <div id="locatedTweets"></div>
-                </div>
-                </div>
+
+                </section>
               </div>
-            </main><!-- main -->
+            </div>
+          </main><!-- main -->
 
         </div>
 </div>
