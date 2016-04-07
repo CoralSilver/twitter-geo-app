@@ -1,9 +1,20 @@
-#map {
-  width: 50%;
+.grid-left {
+  @include outer-container;
+  @include span-columns(9);
   float: left;
 }
 
 #savedSearchContainer {
-  width: 50%;
+  @include span-columns(3);
+  @include omega();
   float: right;
+}
+
+#output-location-data {
+  @include span-columns(5);
+}
+
+#output-map {
+  @include span-columns(7);
+  @include omega();
 }
