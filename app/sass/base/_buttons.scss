@@ -29,3 +29,28 @@ button {
     opacity: 0.5;
   }
 }
+
+.button {
+  &-small {
+    padding: 0.5em $small-spacing;
+    font-size: .9em;
+  }
+  &-unstyled {
+    background-color: transparent;
+    padding: 0;
+    &:hover,
+    &:focus {
+      background-color: transparent;
+    }
+  }
+  &-clear-icon {
+    color: transparent;
+    position: absolute;
+    right: 0;
+    top: 0;
+    &:hover,
+    &:focus {
+      color: $medium-gray;
+    }
+  }
+}
