@@ -1,0 +1,63 @@
+.expander {
+  $base-font-size: 1em !default;
+  $base-line-height: 1.5em !default;
+  $base-spacing: 1.5em !default;
+  $action-color: #477DCA !default;
+  $dark-gray: #333 !default;
+  $light-gray: #DDD !default;
+  $base-font-color: $dark-gray !default;
+  $expander-plus-width: 1em;
+  $expander-toggle-size: 1em;
+  $expander-toggle-arrow-size: $expander-toggle-size;
+  $expander-toggle-margin: 1em;
+
+  .expander-trigger {
+    @include user-select(none);
+    border-bottom: 1px solid $light-gray;
+    color: $action-color;
+    cursor: pointer;
+    display: block;
+    font-size: $expander-toggle-size;
+    margin-bottom: $expander-toggle-size;
+    padding-bottom: $expander-toggle-size / 4;
+    text-decoration: none;
+
+    i {
+      font-weight: bold;
+      font-size: 18px;
+      vertical-align: text-top;
+      padding-right: 5px;
+      padding-top: 2px;
+      &:last-child {
+        color: $red;
+        padding-left: 5px;
+      }
+    } &:before {
+      font-size: $expander-plus-width;
+      content: "\2D";
+      font-weight: bold;
+      margin-right: 0.5em;
+      position: absolute;
+    }
+    span {
+      padding-left: 1em;
+    }
+  }
+
+  .expander-content p {
+    color: $base-font-color;
+    line-height: $base-line-height;
+  }
+
+  .expander-hidden {
+    &:before {
+      font-size: $expander-plus-width;
+      content: "\2B";
+      position: absolute;
+    }
+  }
+
+  .expander-hidden + .expander-content {
+    display: none;
+  }
+}
