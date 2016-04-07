@@ -17,14 +17,20 @@
         <!-- endbower -->
         <!-- endbuild -->
         <!-- build:css(.tmp) styles/main.css -->
-        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
-        <link rel="stylesheet" href="styles/main.css">
-        <script src="bower_components/oauthio-web/dist/oauth.js"></script>
-        <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
-
         <!-- endbuild -->
+
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="styles/main.css">
+
+        <!-- build:js scripts/vendor.js -->
+        <!-- bower:js -->
+        <script src="bower_components/oauthio-web/dist/oauth.js"></script>
+        <!-- endbower -->
+        <!-- endbuild -->
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+        <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
     </head>
     <body>
         <!--[if lt IE 10]>
@@ -72,10 +78,13 @@
                       <div id="savedSearches" class="expander-content">
                       </div>
                     </div>
-                    <div class="expander">
+                    <div class="expander"  id="saved-tweets">
                       <a href="javascript:void(0)" class="expander-trigger expander-hidden">
                         <span><strong>Favorited tweets</strong><i class="material-icons md-18  heart heart-favorited">favorite</i></a></span>
                       <div id="favorited-tweets" class="expander-content">
+                        <div class="">
+                          <p>You have no favorites :(</p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -86,7 +95,7 @@
           </main><!-- main -->
 
         </div>
-</div>
+        </div>
 
         <footer>
         </footer>
@@ -95,10 +104,9 @@
         <!-- bower:js -->
         <script src="../bower_components/jquery/dist/jquery.js"></script>
         <script src="../bower_components/moment/moment.js"></script>
-        <script src="scripts/main.js"></script>
-
         <!-- endbower -->
         <!-- endbuild -->
+        <script src="scripts/main.js"></script>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>
