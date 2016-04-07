@@ -1,31 +1,42 @@
-.tweet-container {
-  background-color: $white;
-  border: $base-border;
-  border-radius: $base-border-radius;
-  border-top: 4px solid $blue;
-  margin: $small-spacing/2 0;
-  padding: $small-spacing 2em $small-spacing $small-spacing;
-  width: 75%;
-  float: left;
-  position: relative;
-  .profile-image {
-    border-radius: 50%;
-    border: 2px solid $light-gray;
-    float: left;
-    margin-right: $small-spacing;
-  }
-  .user-name {
-    font-size: em(15);
-    font-weight: bold;
-  }
-  .heart {
-    color: $light-gray;
-    cursor: pointer;
-    position: absolute;
-    right: 5px;
-    bottom: 5px;
-    &-favorited {
-      color: #D66868;
+  #locatedTweets {
+    .tweet-container{
+      width: 100%;
     }
   }
-}
+
+  .tweet-container {
+    background-color: $white;
+    border: $base-border;
+    border-radius: $base-border-radius;
+    border-top: 4px solid $blue;
+    margin: $small-spacing/2 0;
+    padding: $small-spacing 2em $small-spacing $small-spacing;
+    float: left;
+    position: relative;
+    //width: 70%;
+    .profile-image {
+      border-radius: 50%;
+      border: 2px solid $light-gray;
+      float: left;
+      margin-right: $small-spacing;
+    }
+    .user-name {
+      font-size: em(15);
+      font-weight: bold;
+    }
+    .heart {
+      color: $light-gray;
+      cursor: pointer;
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
+      &-favorited {
+        color: $red;
+      }
+    }
+    .date {
+      color: $medium-gray;
+      font-size: em(14);
+      margin-left: $small-spacing;
+    }
+  }
