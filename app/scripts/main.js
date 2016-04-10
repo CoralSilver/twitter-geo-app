@@ -6,7 +6,9 @@ var $outputMap = $("#output-map");
 var $locatedTweets = $('#locatedTweets');
 var $savedTweets = $('#favorited-tweets');
 var locationObj = {};
-
+var locRef;
+var twitterRef;
+var locationRef;
 
 //Create Firebase
 var fireb = new Firebase('https://coralsilver.firebaseio.com/');
@@ -16,8 +18,10 @@ function login(){
     twitterRequestor = result;
     twitterRequestor.me().then(function(profile, lastChildKey, data){
       currentUser = profile;
-      retreiveSavedData('location');
-      retreiveSavedData('tweets');
+      // retreiveSavedData('location');
+      // retreiveSavedData('tweets');
+      retreiveSavedLocationData();
+      retreiveSavedTweetData();
     })
     loggedIn();
   }).fail(function (err) {
@@ -62,35 +66,56 @@ $(document).on('click', '#show-tweets-button', function() {
   geoFindMe();
 });
 
-function logout(){
-  OAuth.clearCache('twitter');
-  locationObj = {};
-  currentUser = {};
-  $('.header, #appLoggedIn').addClass('hidden')
-  var $loggedInContainer = $('#appLoggedIn')
-  $loggedInContainer.find('#out').html('');
-  $loggedInContainer.find('#locatedTweets').html('');
-  $('#savedSearches').html('');
-  $('.login-container').removeClass('hidden');
-}
+//function to retrieve saved locations and tweets to be called once on login
+function retreiveSavedData(objectType) {
+  var locRef = fireb.child('users').child(currentUser.id).child(objectType);
 
-//function to retrieve saved locations and tweets
-function retreiveSavedData(lastChildKey) {
-  var locRef = fireb.child('users').child(currentUser.id).child(lastChildKey);
-  locRef.on("value", function(snapshot) {
+  locRef.once('value', function(snapshot) {
     var snapshot = snapshot.val();
     var data = Object.keys(snapshot).map(function(key){
       return snapshot[key]
     });
 
-    if (lastChildKey === 'location' ) {
-      buildSavedLocations(data);
-      console.log('location + ' + data);
+    if (objectType === 'location' ) {
+      data.forEach(function(location){
+        // buildSavedLocations(location);
+        console.log('location + ' + location);
+      })
     } else {
        $('#favorited-tweets').html('');
-       parseTweetData(data, $savedTweets); //appending to already added tweets on every value change
+       //parseTweetData(data, $savedTweets); //appending to already added tweets on every value change
        $('#favorited-tweets .heart').addClass('heart-favorited'); //make this only happen once
     }
+
+  }, function (errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });
+}
+
+//function to retrieve tweets
+function retreiveSavedTweetData() {
+  var twitterRef = fireb.child('users').child(currentUser.id).child('tweets');
+  twitterRef.on("child_added", function(childSnapshot) {
+    var snapshot = childSnapshot.val();
+
+    /*
+      parseTweetData should take a third parameter indicating whether or not the
+      heart class should be active
+    */
+    parseTweetData(snapshot, $savedTweets);
+    $('#favorited-tweets .heart').addClass('heart-favorited'); //this is adding it everytime to all favorited 
+  }, function (errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });
+}
+
+//function to retrieve locations
+function retreiveSavedLocationData() {
+  var locationRef = fireb.child('users').child(currentUser.id).child('location');
+
+  locationRef.on("child_added", function(childSnapshot) {
+    var snapshot = childSnapshot.val();
+    buildSavedLocations(snapshot);
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);
   });
@@ -107,7 +132,10 @@ function getTweetsByLocation(lat, lon, miles){
   };
 
   twitterRequestor.get(apiEndpoint).done(function(data, media_url) {
-    parseTweetData(data.statuses, $locatedTweets);
+    data.statuses.forEach(function(status){
+      parseTweetData(status, $locatedTweets);
+    })
+
     console.log('tweet', data.statuses);
   }).fail(function(err) {
     console.warn(err);
@@ -116,10 +144,10 @@ function getTweetsByLocation(lat, lon, miles){
 
 //create Handlebars template for tweets
 function parseTweetData (data, divToAppend) {
-  var source = $('#parsedTweetContainers').html();
-  var template = Handlebars.compile(source);
-  var result = template(data);
-  //divToAppend.html('');
+  // var source = $('#parsedTweetContainers').html();
+  var twitterTemplate = Handlebars.compile($('#parsedTweetContainers').html());
+  var result = twitterTemplate(data);
+  console.log(result);
   divToAppend.append(result);
 }
 
@@ -136,9 +164,8 @@ Handlebars.registerHelper('urlify', function(text) {
 
 //create Handlebars template for saved locations
 function buildSavedLocations(locations) {
-  var source = $('#savedLocations').html();
-  var template = Handlebars.compile(source);
-  var result = template(locations);
+  var locationTemplate = Handlebars.compile($('#savedLocations').html());
+  var result = locationTemplate(locations);
   $('#savedSearches').append(result);
 }
 
@@ -189,7 +216,6 @@ function saveSearchLocation() {
     locationInput.val('');
   })
 }
-
 saveSearchLocation();
 
 function favorite() {
@@ -238,3 +264,15 @@ function expandSection() {
 }
 
 expandSection();
+
+function logout(){
+  OAuth.clearCache('twitter');
+  locationObj = {};
+  currentUser = {};
+  $('.header, #appLoggedIn').addClass('hidden')
+  var $loggedInContainer = $('#appLoggedIn')
+  $loggedInContainer.find('#out').html('');
+  $loggedInContainer.find('#locatedTweets').html('');
+  $('#savedSearches').html('');
+  $('.login-container').removeClass('hidden');
+}
