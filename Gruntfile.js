@@ -139,14 +139,14 @@ module.exports = function (grunt) {
         // },
 
         // Mocha testing framework configuration options
-        mocha: {
-            all: {
-                options: {
-                    run: true,
-                    urls: ['http://<%= connect.options.hostname %>:<%= connect.test.options.port %>/index.html']
-                }
-            }
-        },
+        // mocha: {
+        //     all: {
+        //         options: {
+        //             run: true,
+        //             urls: ['http://<%= connect.options.hostname %>:<%= connect.test.options.port %>/index.html']
+        //         }
+        //     }
+        // },
 
         // Compiles Sass to CSS and generates necessary files if requested
         sass: {
@@ -192,29 +192,38 @@ module.exports = function (grunt) {
         },
 
         // Automatically inject Bower components into the HTML file
-        bowerInstall: {
-            app: {
-                src: ['<%= config.app %>/index.html']
-            },
-            sass: {
-                src: ['<%= config.app %>/sass/{,*/}*.{scss,sass}']
-            }
+        wiredep: {
+          app: {
+            ignorePath: /^\/|\.\.\//,
+            src: ['<%= config.app %>/index.html']
+          }
         },
 
+        // // Automatically inject Bower components into the HTML file
+        // bowerInstall: {
+        //     app: {
+        //         src: ['<%= config.app %>/index.html']
+        //     }
+        //     // sass: {
+        //     //     src: ['<%= config.app %>/sass/{,*/}*.{scss,sass}']
+        //     // }
+        // },
+
+
         // Renames files for browser caching purposes
-        rev: {
-            dist: {
-                files: {
-                    src: [
-                        '<%= config.dist %>/scripts/{,*/}*.js',
-                        '<%= config.dist %>/styles/{,*/}*.css',
-                        '<%= config.dist %>/images/{,*/}*.*',
-                        '<%= config.dist %>/styles/fonts/{,*/}*.*',
-                        '<%= config.dist %>/*.{ico,png}'
-                    ]
-                }
-            }
-        },
+        // rev: {
+        //     dist: {
+        //         files: {
+        //             src: [
+        //                 '<%= config.dist %>/scripts/{,*/}*.js',
+        //                 '<%= config.dist %>/styles/{,*/}*.css',
+        //                 '<%= config.dist %>/images/{,*/}*.*',
+        //                 '<%= config.dist %>/styles/fonts/{,*/}*.*',
+        //                 '<%= config.dist %>/*.{ico,png}'
+        //             ]
+        //         }
+        //     }
+        // },
 
         // Reads HTML for usemin blocks to enable smart builds that automatically
         // concat, minify and revision files. Creates configurations in memory so
@@ -225,7 +234,7 @@ module.exports = function (grunt) {
             },
             html: '<%= config.app %>/index.html'
         },
-
+        //
         // Performs rewrites based on rev and the useminPrepare configuration
         usemin: {
             options: {
@@ -236,74 +245,58 @@ module.exports = function (grunt) {
         },
 
         // The following *-min tasks produce minified files in the dist folder
-        imagemin: {
-            dist: {
-                files: [{
-                    expand: true,
-                    cwd: '<%= config.app %>/images',
-                    src: '{,*/}*.{gif,jpeg,jpg,png}',
-                    dest: '<%= config.dist %>/images'
-                }]
-            }
-        },
-
-        svgmin: {
-            dist: {
-                files: [{
-                    expand: true,
-                    cwd: '<%= config.app %>/images',
-                    src: '{,*/}*.svg',
-                    dest: '<%= config.dist %>/images'
-                }]
-            }
-        },
-
-        htmlmin: {
-            dist: {
-                options: {
-                    collapseBooleanAttributes: true,
-                    collapseWhitespace: true,
-                    removeAttributeQuotes: true,
-                    removeCommentsFromCDATA: true,
-                    removeEmptyAttributes: true,
-                    removeOptionalTags: true,
-                    removeRedundantAttributes: true,
-                    useShortDoctype: true
-                },
-                files: [{
-                    expand: true,
-                    cwd: '<%= config.dist %>',
-                    src: '{,*/}*.html',
-                    dest: '<%= config.dist %>'
-                }]
-            }
-        },
+        // imagemin: {
+        //     dist: {
+        //         files: [{
+        //             expand: true,
+        //             cwd: '<%= config.app %>/images',
+        //             src: '{,*/}*.{gif,jpeg,jpg,png}',
+        //             //src: '<%= config.app %>/images/*.{gif,jpg,png,svg}',
+        //             dest: '<%= config.dist %>/images'
+        //
+        //             // dest: '<%= config.dist %>/images'
+        //         }]
+        //     }
+        // },
 
         // By default, your `index.html`'s <!-- Usemin block --> will take care of
         // minification. These next options are pre-configured if you do not wish
         // to use the Usemin blocks.
-        // cssmin: {
-        //     dist: {
-        //         files: {
-        //             '<%= config.dist %>/styles/main.css': [
-        //                 '.tmp/styles/{,*/}*.css',
-        //                 '<%= config.app %>/styles/{,*/}*.css'
-        //             ]
-        //         }
-        //     }
-        // },
-        // uglify: {
-        //     dist: {
-        //         files: {
-        //             '<%= config.dist %>/scripts/scripts.js': [
-        //                 '<%= config.dist %>/scripts/scripts.js'
-        //             ]
-        //         }
-        //     }
-        // },
-        // concat: {
-        //     dist: {}
-        // },
+        cssmin: {
+            dist: {
+                files: {
+                    '<%= config.dist %>/styles/main.css': [
+                        '.tmp/styles/{,*/}*.css'
+                        // '<%= config.app %>/styles/{,*/}*.css'
+                    ]
+                }
+            }
+        },
+        uglify: {
+            dist: {
+                files: {
+                    '<%= config.dist %>/scripts/vendor.js': ['<%= config.dist %>/scripts/vendors/*.js']
+                }
+            }
+        },
+        concat: {
+          options: {
+            // define a string to put between each file in the concatenated output
+            separator: ';'
+          },
+          dist: {
+            src: '<%= config.dist %>/scripts/vendors/*.js',
+            dest: '<%= config.dist %>/scripts/vendor.js',
+          }
+        },
+
+ //        dist: {
+ //   src: [
+ //     'bower/jquery/jquery.js',
+ //     'assets/js/script.js'
+ //   ],
+ //   dest: 'public/assets/app.js',
+ // },
 
         // Copies remaining files to places other tasks can use
         copy: {
@@ -316,9 +309,10 @@ module.exports = function (grunt) {
                     src: [
                         '*.{ico,png,txt}',
                         '.htaccess',
-                        'images/{,*/}*.webp',
+                        'images/{,*/}*.*',
                         '{,*/}*.html',
-                        'styles/fonts/{,*/}*.*'
+                        'styles/fonts/{,*/}*.*',
+                        'scripts/*.js'
                     ]
                 }]
             },
@@ -331,24 +325,47 @@ module.exports = function (grunt) {
             }
         },
 
+        bower_concat: {
+          basic: {
+//Defines the filetypes to be concatenated into a destination file. Where the key is the file extension (without the dot) and the value is the destination file. E.g:
+            dest:  {
+              js: '<%= config.app %>/scripts/vendor-scripts.js'
+            }
+          },
+        },
+
+        bowercopy: {
+          options: {
+            srcPrefix: 'bower_components'
+          },
+          scripts: {
+            options: {
+              destPrefix: 'dist/scripts/vendors'
+            },
+            files: {
+              'jquery.min.js': 'jquery/dist/jquery.min.js',
+              'moment.js': 'moment/moment.js',
+              'oauth.min.js': 'oauthio-web/dist/oauth.min.js'
+            }
+          }
+        },
+
         // Run some tasks in parallel to speed up build process
         concurrent: {
             server: [
                 'sass:server',
                 'copy:styles'
             ],
-            test: [
-                'copy:styles'
-            ],
+            // test: [
+            //     'copy:styles'
+            // ],
             dist: [
                 'sass',
-                'copy:styles',
-                'imagemin',
-                'svgmin'
+                'copy:styles'
+                // 'imagemin'
             ]
         }
-    });
-
+    }),
 
     grunt.registerTask('serve', function (target) {
         if (target === 'dist') {
@@ -369,37 +386,26 @@ module.exports = function (grunt) {
         grunt.task.run([target ? ('serve:' + target) : 'serve']);
     });
 
-    grunt.registerTask('test', function (target) {
-        if (target !== 'watch') {
-            grunt.task.run([
-                'clean:server',
-                'concurrent:test',
-                'autoprefixer'
-            ]);
-        }
-
-        grunt.task.run([
-            'connect:test',
-            'mocha'
-        ]);
-    });
-
     grunt.registerTask('build', [
         'clean:dist',
         'useminPrepare',
         'concurrent:dist',
         'autoprefixer',
+        'bowercopy',
+        'copy:dist',
+        // 'bower_concat',
         'concat',
         'cssmin',
-        'copy:dist',
-        'rev',
-        'usemin',
-        'htmlmin'
+        'uglify',
+        // 'rev'
+         'wiredep',
+         'usemin'
+        // 'htmlmin'
     ]);
 
     grunt.registerTask('default', [
         //'newer:jshint',
-        'test',
+        // 'test',
         'build'
     ]);
 };
