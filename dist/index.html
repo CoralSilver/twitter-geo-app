@@ -1,0 +1,134 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="author" content="Coral Silverman">
+        <meta name="description" content="search tweets based on your geolocation">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>twitter-locator-app</title>
+
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        <link rel="shortcut icon" href="/favicon.ico">
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+        <link rel="stylesheet" href="styles/vendor.css">
+
+        <link rel="stylesheet" href="styles/main.css">
+
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+        <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+
+    </head>
+    <body>
+        <!--[if lt IE 10]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+          <header class="header hidden">
+            <div class="container">
+              <img src="images/location-marker.png" alt="logo" class="logo"/>
+              <button class="btn float-left" id="show-tweets-button">Show tweets near me</button>
+              <div class="distance-range float-left">
+                <label for="fader">Distance Range (miles)</label>
+                <input type="range" min="0" max="5" value="1" id="fader" step=".05" oninput="outputUpdate(value)">
+                <output for="fader" id="volume">1</output>
+              </div>
+              <button class="btn float-right" onclick="logout()">Log out</button>
+            </div>
+          </header>
+
+          <main>
+
+            <div class="login-container">
+              <div class="image-container">
+              </div>
+              <button id="logIn" class="btn" onclick="login()">Log in</button>
+              </div>
+            </div>
+
+            <div class="container">
+              <div id="appLoggedIn" class="hidden">
+                <section class="section">
+
+                  <div class="grid-left">
+                    <div class="location-output">
+                      <div id="output-location-data"></div>
+                      <div id="output-map"></div>
+                    </div>
+
+                    <div id="locatedTweets">
+                      <script id="parsedTweetContainers" type="text/x-handlebars-template">
+                        <div class="tweet-container" data-json="{{json this}}">
+                          <i class="material-icons heart">favorite</i>
+                          <img src = "{{user.profile_image_url}}" class="profile-image">
+                          <span class="user-name">
+                            <a href="https://twitter.com/{{user.screen_name}}" target="_blank">
+                              {{user.screen_name}}
+                            </a>
+                          </span>
+                          <span class="date">{{relativeDate created_at}}</span>
+                          <p>{{{urlify text}}}</p>
+                          {{#if entities.media}}
+                            {{#each this.entities.media}}
+                            <img src="{{media_url}}" />
+                            {{/each}}
+                          {{/if}}
+                        </div>
+                      </script>
+                    </div>
+                  </div>
+
+                  <div id="savedSearchContainer">
+                    <div class="expander">
+                      <a href="javascript:void(0)" class="expander-trigger expander-hidden">
+                        <span><strong>Saved search locations</strong><i class="material-icons md-18 ">room</i></a></span>
+                      <div id="savedSearches" class="expander-content">
+                        <script id="savedLocations" type="text/x-handlebars-template">
+                          <div class="saved-location-inner-container" data-lat="{{latitude}}" data-long="{{longitude}}" data-miles="{{miles}}">
+                            <button role="button" class="button-unstyled button-clear-icon"><i class="material-icons">clear</i></button>
+                            <h3>{{name}}</h3>
+                            <span>Latitude: {{latitude}}</span></br>
+                            <span>Latitude: {{longitude}}</span></br>
+                            <span>Distance Range: {{miles}} mi.</span></br>
+                            <button type="button" class="button-small saved-search-button float-right">Search</button>
+                          </div>
+                        </script>
+                      </div>
+                    </div>
+                    <div class="expander"  id="saved-tweets">
+                      <a href="javascript:void(0)" class="expander-trigger expander-hidden">
+                        <span><strong>Favorited tweets</strong><i class="material-icons md-18  heart heart-favorited">favorite</i></a></span>
+                      <div id="favorited-tweets" class="expander-content">
+                      </div>
+                    </div>
+                  </div>
+
+                </section>
+              </div>
+            </div>
+          </main><!-- main -->
+
+        </div>
+        </div>
+
+        <footer>
+        </footer>
+
+        <script src="scripts/vendor-scripts.js"></script>
+        <script src="scripts/main.js"></script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+           (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='https://www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+        </script>
+    </body>
+</html>
