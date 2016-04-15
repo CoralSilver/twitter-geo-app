@@ -1,3 +1,4 @@
+
 OAuth.initialize('7bIgDNbrQL4S2mH034k8dO4KxBE');
 var twitterRequestor;
 var currentUser;
@@ -103,7 +104,7 @@ function retreiveSavedTweetData() {
       heart class should be active
     */
     parseTweetData(snapshot, $savedTweets);
-    $('#favorited-tweets .heart').addClass('heart-favorited'); //this is adding it everytime to all favorited 
+    $('#favorited-tweets .heart').addClass('heart-favorited'); //this is adding it everytime to all favorited
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);
   });
@@ -180,6 +181,15 @@ $(document).on('click', '#saved-tweets .heart-favorited, .button-clear-icon', fu
   $(this).parent('div').fadeOut('slow').detach();
 });
 
+(function deleteSavedLocations() {
+  $(document).on('click', '.button-clear-icon', function() {
+    var locationContainer =  $(this).parent('div');
+    var locationName = locationContainer.find('#location-name').text();
+    fireb.child('users').child(currentUser.id).child('location').child(locationName).remove();
+    locationContainer.fadeOut('slow').remove();
+  });
+}) ();
+
 $(document).on('click', '.saved-search-button', function() {
   var lat = $(this).parent('div').data('lat');
   var lon = $(this).parent('div').data('long');
@@ -205,7 +215,7 @@ function outputUpdate(vol) {
 	$('#volume').val(vol);
 }
 
-function saveSearchLocation() {
+(function saveSearchLocation() {
   $(document).on('click','#saveSearch',function(e){
     e.preventDefault();
     var locationInput = $('#location-input');
@@ -215,8 +225,7 @@ function saveSearchLocation() {
     fireb.child('users').child(currentUser.id).child('location').child(locationName).set(locationObj);
     locationInput.val('');
   })
-}
-saveSearchLocation();
+}) ();
 
 function favorite() {
   $(document).on('click','.heart',function(){
@@ -251,7 +260,7 @@ $(document).on('click','.heart',function(){
   }
 });
 
-function expandSection() {
+(function expandSection() {
   $('.expander-trigger').click(function(){
     var self = $(this);
     self.toggleClass("expander-hidden");
@@ -261,9 +270,7 @@ function expandSection() {
       //alert('remove');
     }
   });
-}
-
-expandSection();
+}) ();
 
 function logout(){
   OAuth.clearCache('twitter');
