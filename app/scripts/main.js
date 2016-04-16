@@ -145,10 +145,8 @@ function getTweetsByLocation(lat, lon, miles){
 
 //create Handlebars template for tweets
 function parseTweetData (data, divToAppend) {
-  // var source = $('#parsedTweetContainers').html();
   var twitterTemplate = Handlebars.compile($('#parsedTweetContainers').html());
-  var result = twitterTemplate(data);
-  console.log(result);
+  var result = $(twitterTemplate(data)).data('json', data);
   divToAppend.append(result);
 }
 
