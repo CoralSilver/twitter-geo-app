@@ -3,7 +3,7 @@ OAuth.initialize('7bIgDNbrQL4S2mH034k8dO4KxBE');
 var twitterRequestor;
 var currentUser;
 var $outputLocationData = $("#output-location-data");
-var $outputMap = $("#output-map");
+var $outputMap = $("#map");
 var $locatedTweets = $('#locatedTweets');
 var $savedTweets = $('#favorited-tweets');
 var locationObj = {};
@@ -42,28 +42,90 @@ function geoFindMe() {
   }
 
   $outputLocationData.html('<div class="loading"><img src="../images/arrow.png" class="loading-icon"></div>');
-  navigator.geolocation.getCurrentPosition(success, error);
+  navigator.geolocation.getCurrentPosition(initMap, error);
 }
+// //function success(position)
+// function initMap(position) {  //position is automatically returned?
+//   // latitude  = position.coords.latitude.toFixed(5);
+//   // longitude = position.coords.longitude.toFixed(5);
+//   //console.log('initMap ' + latitude);
+//   //buildResults(latitude, longitude);
+//   //buildForm();
+//
+//   var map = new google.maps.Map(document.getElementById('map'), {
+//     zoom: 8,
+//     center: {lat: 40.731, lng: -73.997}
+//   });
+//   var geocoder = new google.maps.Geocoder;
+//   var infowindow = new google.maps.InfoWindow;
+//
 
-function success(position) {  //position is automatically returned?
+// }
+
+function initMap(position) {
   latitude  = position.coords.latitude.toFixed(5);
   longitude = position.coords.longitude.toFixed(5);
-  buildResults(latitude, longitude);
-  buildForm();
+  var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 15,
+    center: {lat: parseFloat(latitude), lng: parseFloat(longitude)}
+  });
+  var geocoder = new google.maps.Geocoder;
+  var infowindow = new google.maps.InfoWindow;
+  google.maps.event.trigger(map, 'resize');
+  // document.getElementById('submit').addEventListener('click', function() {
+  //   geocodeLatLng(geocoder, map, infowindow);
+  // });
+
+  $(document).on('click', '#show-tweets-button', function() {
+   geocodeLatLng(geocoder, map, infowindow);
+   buildResults(latitude, longitude);
+  });
+}
+
+document.getElementById('logIn').addEventListener('click', function() {
+      initMap();
+});
+
+function geocodeLatLng(geocoder, map, infowindow) {
+  // var input = document.getElementById('latlng').value;
+  // var latlngStr = input.split(',', 2);
+  var latlng = {lat: parseFloat(latitude), lng: parseFloat(longitude)};
+  geocoder.geocode({'location': latlng}, function(results, status) {
+    if (status === google.maps.GeocoderStatus.OK) {
+      if (results[1]) {
+        map.setZoom(15);
+        var marker = new google.maps.Marker({
+          position: latlng,
+          map: map
+        });
+        infowindow.setContent(results[1].formatted_address);
+        infowindow.open(map, marker);
+        console.log(marker);
+      } else {
+        window.alert('No results found');
+      }
+    } else {
+      window.alert('Geocoder failed due to: ' + status);
+    }
+  });
 }
 
 function buildResults(latitude, longitude){
   getTweetsByLocation(latitude, longitude);
   var zoom = 14;
 
-  $outputLocationData.html('<p>Latitude is ' + latitude + '° <br>Longitude is ' + longitude + '°</p>');
-
-  var $img = new Image();
-  $img.src = "https://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=" + zoom + "&size=500x200&sensor=false";
-  $outputMap.html($img)
+  // $outputLocationData.html('<p>Latitude is ' + latitude + '° <br>Longitude is ' + longitude + '°</p>');
+  //
+  // var $img = new Image();
+  // $img.src = "https://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=" + zoom + "&size=500x200&sensor=false";
+  // $outputMap.html($img)
 }
 
-$(document).on('click', '#show-tweets-button', function() {
+// $(document).on('click', '#show-tweets-button', function() {
+//   geoFindMe();
+// });
+
+$(document).on('click', '#logIn', function() {
   geoFindMe();
 });
 
@@ -147,26 +209,16 @@ function getTweetsByLocation(lat, lon, miles){
 function parseTweetData (data, divToAppend) {
   var twitterTemplate = Handlebars.compile($('#parsedTweetContainers').html());
   var result = $(twitterTemplate(data)).data('json', data);
-  divToAppend.append(result);
+  divToAppend.prepend(result);
 }
 
-//Handlebars helper functions
-
-Handlebars.registerHelper('json', JSON.stringify);
-
+//Handlebars helper function
 Handlebars.registerHelper('urlify', function(text) {
   var twitterUrlRegex = /(https?:\/+t.co\/[^\s]+)/g;
   return text.replace(twitterUrlRegex, function(url) {
       return new Handlebars.SafeString('<a href="' + url + '" ' + 'target="_blank">' + url + '</a>');
   })
 });
-
-//create Handlebars template for saved locations
-function buildSavedLocations(locations) {
-  var locationTemplate = Handlebars.compile($('#savedLocations').html());
-  var result = locationTemplate(locations);
-  $('#savedSearches').append(result);
-}
 
 //Handlebars helper function to parse date
 Handlebars.registerHelper('relativeDate', function(date) {
@@ -175,18 +227,11 @@ Handlebars.registerHelper('relativeDate', function(date) {
     return new Handlebars.SafeString('<span class="date">'+ relativeDate +'</span>');
 });
 
-$(document).on('click', '#saved-tweets .heart-favorited, .button-clear-icon', function() {
-  $(this).parent('div').fadeOut('slow').detach();
-});
-
-(function deleteSavedLocations() {
-  $(document).on('click', '.button-clear-icon', function() {
-    var locationContainer =  $(this).parent('div');
-    var locationName = locationContainer.find('#location-name').text();
-    fireb.child('users').child(currentUser.id).child('location').child(locationName).remove();
-    locationContainer.fadeOut('slow').remove();
+(function removeFavoritedTweet() {
+  $(document).on('click', '#saved-tweets .heart-favorited', function() {
+    $(this).parent('div').fadeOut('slow').detach();
   });
-}) ();
+})();
 
 $(document).on('click', '.saved-search-button', function() {
   var lat = $(this).parent('div').data('lat');
@@ -214,37 +259,76 @@ function outputUpdate(vol) {
 }
 
 (function saveSearchLocation() {
-  $(document).on('click','#saveSearch',function(e){
+  $(document).on('click','#save-location',function(e){
     e.preventDefault();
     var locationInput = $('#location-input');
     var locationName = locationInput.val();
+    var locationAddress = $('.gm-style-iw').text();
     locationObj.name = locationName;
+    locationObj.address = locationAddress;
     //.child(locationName) sets locations alphabetically, not in order they are added
     fireb.child('users').child(currentUser.id).child('location').child(locationName).set(locationObj);
     locationInput.val('');
+    $('.save-location-form').addClass('hidden');
   })
 }) ();
 
-function favorite() {
-  $(document).on('click','.heart',function(){
-    $(this).toggleClass('heart-favorited');
-    var self = $(this);
-    if ($(this).hasClass('heart-favorited')) {
-      var message = self.data('twitter-message-obj');
-      console.log(message);
-      //save the message
-    } else {
-      self.attr('data-favorited', 'false');
-      //remove the message
-    }
+(function showLocationForm() {
+  $(document).on('click','.add-location',function(){
+    $('.save-location-form').removeClass('hidden');
   });
+})();
+
+(function deleteSavedLocations() {
+  $(document).on('click', '.button-clear-icon', function() {
+    var locationContainer =  $(this).parent('div');
+    var locationName = locationContainer.find('#location-name').text();
+    fireb.child('users').child(currentUser.id).child('location').child(locationName).remove();
+    locationContainer.fadeOut('slow').remove();
+  });
+}) ();
+
+//create Handlebars template for saved locations
+function buildSavedLocations(locations) {
+  var locationTemplate = Handlebars.compile($('#savedLocations').html());
+  var result = locationTemplate(locations);
+  $('#savedSearches').append(result);
 }
+
+// function favorite() {
+//   $(document).on('click','.heart',function(){
+//     $(this).toggleClass('heart-favorited');
+//     var self = $(this);
+//     if ($(this).hasClass('heart-favorited')) {
+//       var message = self.data('twitter-message-obj');
+//       console.log(message);
+//       //save the message
+//     } else {
+//       self.attr('data-favorited', 'false');
+//       //remove the message
+//     }
+//   });
+// }
 
 $(document).on('click','.heart',function(){
   var theHeart = $(this);
   var tweetObj = theHeart.parent('.tweet-container').data('json');
   theHeart.toggleClass('heart-favorited');
-  console.log('this is the tweet obj' + tweetObj);
+  console.log('this is the tweet obj' + tweetObj.id_str);
+
+
+  var $eachLocatedTweet = $locatedTweets.find('.tweet-container');
+   for(var i=0; i< $eachLocatedTweet.length; i++) {
+     var tweetData = $eachLocatedTweet.data('json');
+     var tweetID = tweetData.id_str;
+     console.log('tweetID ' + tweetData);
+   }
+  var $tweetData = $eachLocatedTweet.data();
+  var idString = $tweetData.id_str;
+  if (tweetObj.id_str === idString) {
+    console.log('match');
+  }
+
   if (theHeart.hasClass('heart-favorited') ) {
     //This saves them by object id_string key so they can be referenced and removed
     //They are order in Firebase alphabetically by id_string not order of addition

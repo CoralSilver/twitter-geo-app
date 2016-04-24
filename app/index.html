@@ -29,6 +29,45 @@
         <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
 
     </head>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 300px;
+        width: 100%;
+
+      }
+      #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+      #floating-panel {
+        position: absolute;
+        top: 5px;
+        left: 50%;
+        margin-left: -180px;
+        width: 350px;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+      }
+      #latlng {
+        width: 225px;
+      }
+    </style>
     <body>
         <!--[if lt IE 10]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -61,9 +100,17 @@
                 <section class="section">
 
                   <div class="grid-left">
-                    <div class="location-output">
+                    <!-- <div class="location-output">
                       <div id="output-location-data"></div>
-                      <div id="output-map"></div>
+                       <div id="output-map"></div> -->
+                      <!-- <div id="map"></div> -->
+                    <div id="map-container">
+                      <div id="map"></div>
+                      <button class="button-unstyled"><i class="material-icons add-location md-18">add_location</i></button>
+                        <form class="save-location-form hidden">
+                          <input type="text" id="location-input" placeholder="Name location"/>
+                          <button id="save-location">Save</button>
+                        </form>
                     </div>
 
                     <div id="locatedTweets">
@@ -91,14 +138,13 @@
                   <div id="savedSearchContainer">
                     <div class="expander">
                       <a href="javascript:void(0)" class="expander-trigger expander-hidden">
-                        <span><strong>Saved search locations</strong><i class="material-icons md-18 ">room</i></a></span>
+                        <span><strong>Saved search locations</strong><i class="material-icons md-18">room</i></a></span>
                       <div id="savedSearches" class="expander-content">
                         <script id="savedLocations" type="text/x-handlebars-template">
                           <div class="saved-location-inner-container" data-lat="{{latitude}}" data-long="{{longitude}}" data-miles="{{miles}}">
                             <button role="button" class="button-unstyled button-clear-icon"><i class="material-icons">clear</i></button>
                             <h3 id="location-name">{{name}}</h3>
-                            <span>Latitude: {{latitude}}</span></br>
-                            <span>Latitude: {{longitude}}</span></br>
+                            <span>{{address}}</span></br>
                             <span>Distance Range: {{miles}} mi.</span></br>
                             <button type="button" class="button-small saved-search-button float-right">Search</button>
                           </div>
@@ -133,6 +179,8 @@
         <!-- endbower -->
         <!-- endbuild -->
         <script src="scripts/main.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDxywxX3iqcdvJJ0nIODqR_RNA0WSe3nq8&callback=initMap"></script>
+
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>

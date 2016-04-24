@@ -18,3 +18,30 @@
   @include span-columns(7);
   @include omega();
 }
+
+#map-container {
+  position: relative;
+}
+
+.material-icons.add-location {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: $red;
+  font-size: 38px;
+  background: #FFFFFF;
+  border-radius: 2px;
+  box-shadow: 1px 1px 2px 0px #c0c0c0;
+  padding: 2px;
+  &:hover,
+  &:focus {
+    color: darken($red, 10%);
+
+  }
+}
+
+.save-location-form {
+  position: absolute;
+  top: 9px;
+  right: 56px;
+}
