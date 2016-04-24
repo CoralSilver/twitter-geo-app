@@ -43,23 +43,6 @@ function geoFindMe() {
   $outputLocationData.html('<div class="loading"><img src="../images/arrow.png" class="loading-icon"></div>');
   navigator.geolocation.getCurrentPosition(initMap, error);
 }
-// //function success(position)
-// function initMap(position) {  //position is automatically returned?
-//   // latitude  = position.coords.latitude.toFixed(5);
-//   // longitude = position.coords.longitude.toFixed(5);
-//   //console.log('initMap ' + latitude);
-//   //buildResults(latitude, longitude);
-//   //buildForm();
-//
-//   var map = new google.maps.Map(document.getElementById('map'), {
-//     zoom: 8,
-//     center: {lat: 40.731, lng: -73.997}
-//   });
-//   var geocoder = new google.maps.Geocoder;
-//   var infowindow = new google.maps.InfoWindow;
-//
-
-// }
 
 function initMap(position) {
   latitude  = position.coords.latitude.toFixed(5);
@@ -71,9 +54,6 @@ function initMap(position) {
   var geocoder = new google.maps.Geocoder;
   var infowindow = new google.maps.InfoWindow;
   google.maps.event.trigger(map, 'resize');
-  // document.getElementById('submit').addEventListener('click', function() {
-  //   geocodeLatLng(geocoder, map, infowindow);
-  // });
 
   $(document).on('click', '#show-tweets-button', function() {
    geocodeLatLng(geocoder, map, infowindow);
@@ -81,13 +61,7 @@ function initMap(position) {
   });
 }
 
-document.getElementById('logIn').addEventListener('click', function() {
-      initMap();
-});
-
 function geocodeLatLng(geocoder, map, infowindow) {
-  // var input = document.getElementById('latlng').value;
-  // var latlngStr = input.split(',', 2);
   var latlng = {lat: parseFloat(latitude), lng: parseFloat(longitude)};
   geocoder.geocode({'location': latlng}, function(results, status) {
     if (status === google.maps.GeocoderStatus.OK) {
@@ -112,14 +86,6 @@ function geocodeLatLng(geocoder, map, infowindow) {
 function buildResults(latitude, longitude){
   getTweetsByLocation(latitude, longitude);
   var zoom = 14;
-
-  // $outputLocationData.html('<p>Latitude is ' + latitude + '° <br>Longitude is ' + longitude + '°</p>');
-  //
-  // var $img = new Image();
-  // $img.src = "https://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=" + zoom + "&size=500x200&sensor=false";
-  // $outputMap.html($img)
-}
-
 }
 
 //function to retrieve tweets
@@ -208,15 +174,6 @@ $(document).on('click', '.saved-search-button', function() {
   getTweetsByLocation(lat, lon, miles);
 });
 
-function buildForm() {
-  var $form = $('<form></form>');
-  var $input = '<input id="location-input" type="text" placeholder="Name this location">';
-  var $button =  '<button id="saveSearch" class="btn float-right">Save search location</button>';
-
-  var $assembledForm = $form.append($input + $button);
-  $outputLocationData.append($assembledForm);
-}
-
 function error() {
   $outputLocationData.html("Unable to retrieve your location");
 }
@@ -262,27 +219,11 @@ function buildSavedLocations(locations) {
   $('#savedSearches').append(result);
 }
 
-// function favorite() {
-//   $(document).on('click','.heart',function(){
-//     $(this).toggleClass('heart-favorited');
-//     var self = $(this);
-//     if ($(this).hasClass('heart-favorited')) {
-//       var message = self.data('twitter-message-obj');
-//       console.log(message);
-//       //save the message
-//     } else {
-//       self.attr('data-favorited', 'false');
-//       //remove the message
-//     }
-//   });
-// }
-
 $(document).on('click','.heart',function(){
   var theHeart = $(this);
   var tweetObj = theHeart.parent('.tweet-container').data('json');
   theHeart.toggleClass('heart-favorited');
   console.log('this is the tweet obj' + tweetObj.id_str);
-
 
   var $eachLocatedTweet = $locatedTweets.find('.tweet-container');
    for(var i=0; i< $eachLocatedTweet.length; i++) {
