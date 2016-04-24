@@ -25,6 +25,7 @@ function login(){
       retreiveSavedTweetData();
     })
     loggedIn();
+    geoFindMe();
   }).fail(function (err) {
     console.warn('ERROR', err);
   });
@@ -120,14 +121,6 @@ function buildResults(latitude, longitude){
   // $img.src = "https://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=" + zoom + "&size=500x200&sensor=false";
   // $outputMap.html($img)
 }
-
-// $(document).on('click', '#show-tweets-button', function() {
-//   geoFindMe();
-// });
-
-$(document).on('click', '#logIn', function() {
-  geoFindMe();
-});
 
 //function to retrieve saved locations and tweets to be called once on login
 function retreiveSavedData(objectType) {
