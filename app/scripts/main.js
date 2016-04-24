@@ -95,13 +95,7 @@ function retreiveSavedTweetData() {
   var twitterRef = fireb.child('users').child(currentUser.id).child('tweets');
   twitterRef.on("child_added", function(childSnapshot) {
     var snapshot = childSnapshot.val();
-
-    /*
-      parseTweetData should take a third parameter indicating whether or not the
-      heart class should be active
-    */
-    parseTweetData(snapshot, $savedTweets);
-    $('#favorited-tweets .heart').addClass('heart-favorited'); //this is adding it everytime to all favorited
+    parseTweetData(snapshot, $savedTweets, true);
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);
   });
@@ -131,7 +125,7 @@ function getTweetsByLocation(lat, lon, miles){
 
   twitterRequestor.get(apiEndpoint).done(function(data, media_url) {
     data.statuses.forEach(function(status){
-      parseTweetData(status, $locatedTweets);
+      parseTweetData(status, $locatedTweets, false);
     })
 
     console.log('tweet', data.statuses);
@@ -141,10 +135,13 @@ function getTweetsByLocation(lat, lon, miles){
 }
 
 //create Handlebars template for tweets
-function parseTweetData (data, divToAppend) {
+function parseTweetData (data, divToAppend, favoritedStatus) {
   var twitterTemplate = Handlebars.compile($('#parsedTweetContainers').html());
   var result = $(twitterTemplate(data)).data('json', data);
-  divToAppend.prepend(result);
+  divToAppend.append(result);
+  if (favoritedStatus === true) {
+    $('#favorited-tweets .heart').addClass('heart-favorited')
+  }
 }
 
 //Handlebars helper function
