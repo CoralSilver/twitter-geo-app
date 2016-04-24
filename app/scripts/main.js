@@ -19,8 +19,6 @@ function login(){
     twitterRequestor = result;
     twitterRequestor.me().then(function(profile, lastChildKey, data){
       currentUser = profile;
-      // retreiveSavedData('location');
-      // retreiveSavedData('tweets');
       retreiveSavedLocationData();
       retreiveSavedTweetData();
     })
@@ -122,30 +120,6 @@ function buildResults(latitude, longitude){
   // $outputMap.html($img)
 }
 
-//function to retrieve saved locations and tweets to be called once on login
-function retreiveSavedData(objectType) {
-  var locRef = fireb.child('users').child(currentUser.id).child(objectType);
-
-  locRef.once('value', function(snapshot) {
-    var snapshot = snapshot.val();
-    var data = Object.keys(snapshot).map(function(key){
-      return snapshot[key]
-    });
-
-    if (objectType === 'location' ) {
-      data.forEach(function(location){
-        // buildSavedLocations(location);
-        console.log('location + ' + location);
-      })
-    } else {
-       $('#favorited-tweets').html('');
-       //parseTweetData(data, $savedTweets); //appending to already added tweets on every value change
-       $('#favorited-tweets .heart').addClass('heart-favorited'); //make this only happen once
-    }
-
-  }, function (errorObject) {
-    console.log("The read failed: " + errorObject.code);
-  });
 }
 
 //function to retrieve tweets
