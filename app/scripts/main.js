@@ -222,29 +222,19 @@ $(document).on('click','.heart',function(){
   var theHeart = $(this);
   var tweetObj = theHeart.parent('.tweet-container').data('json');
   theHeart.toggleClass('heart-favorited');
-  console.log('this is the tweet obj' + tweetObj.id_str);
-
-  var $eachLocatedTweet = $locatedTweets.find('.tweet-container');
-   for(var i=0; i< $eachLocatedTweet.length; i++) {
-     var tweetData = $eachLocatedTweet.data('json');
-     var tweetID = tweetData.id_str;
-     console.log('tweetID ' + tweetData);
-   }
-  var $tweetData = $eachLocatedTweet.data();
-  var idString = $tweetData.id_str;
-  if (tweetObj.id_str === idString) {
-    console.log('match');
-  }
+  var savedTweetID =  tweetObj.id_str;
 
   if (theHeart.hasClass('heart-favorited') ) {
     //This saves them by object id_string key so they can be referenced and removed
     //They are order in Firebase alphabetically by id_string not order of addition
     //When reassembling saved tweets should sort them by date?
-    console.log('favorited added to DB');
     fireb.child('users').child(currentUser.id).child('tweets').child(tweetObj.id_str).set(tweetObj);
 
   } else {
-    console.log('unfavorited');
+    $unfavoritedTweet = $('[data-id="'+ savedTweetID + '"');
+    $unfavoritedTweet.find('.heart').removeClass('heart-favorited');
+    $('#favorited-tweets').find($unfavoritedTweet).remove();
+    //need to remove saved favorite from DOM and remove heart-favorited class from tweet list tweet if in DOM
     fireb.child('users').child(currentUser.id).child('tweets').child(tweetObj.id_str).remove();
   }
 });
