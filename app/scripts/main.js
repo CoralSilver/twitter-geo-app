@@ -10,6 +10,8 @@ var locationObj = {};
 var locRef;
 var twitterRef;
 var locationRef;
+var latitude;
+var longitude;
 
 //Create Firebase
 var fireb = new Firebase('https://coralsilver.firebaseio.com/');
