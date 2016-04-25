@@ -76,7 +76,7 @@
           <header class="header hidden">
             <div class="container">
               <img src="images/location-marker.png" alt="logo" class="logo"/>
-              <button class="btn float-left" id="show-tweets-button">Show tweets near me</button>
+              <button class="btn float-left" id="show-tweets-button" disabled>Show tweets near me</button>
               <div class="distance-range float-left">
                 <label for="fader">Distance Range (miles)</label>
                 <input type="range" min="0" max="5" value="1" id="fader" step=".05" oninput="outputUpdate(value)">
@@ -106,7 +106,7 @@
                       <!-- <div id="map"></div> -->
                     <div id="map-container">
                       <div id="map"></div>
-                      <button class="button-unstyled"><i class="material-icons add-location md-18">add_location</i></button>
+                      <button id="save-location-icon" class="button-unstyled hidden"><i class="material-icons add-location md-18">add_location</i></button>
                         <form class="save-location-form hidden">
                           <input type="text" id="location-input" placeholder="Name location"/>
                           <button id="save-location">Save</button>

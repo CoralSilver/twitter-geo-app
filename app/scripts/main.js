@@ -57,9 +57,13 @@ function initMap(position) {
   var infowindow = new google.maps.InfoWindow;
   google.maps.event.trigger(map, 'resize');
 
-  $(document).on('click', '#show-tweets-button', function() {
+  var $showTweetsButton = $('#show-tweets-button');
+  $showTweetsButton.removeAttr('disabled');
+
+  $(document).on('click', $showTweetsButton, function() {
    geocodeLatLng(geocoder, map, infowindow);
    buildResults(latitude, longitude);
+   $('#save-location-icon').removeClass('hidden');
   });
 }
 
@@ -90,7 +94,6 @@ function buildResults(latitude, longitude){
   var zoom = 14;
 }
 
-//function to retrieve tweets
 function retreiveSavedTweetData() {
   var twitterRef = fireb.child('users').child(currentUser.id).child('tweets');
   twitterRef.on("child_added", function(childSnapshot) {
@@ -101,7 +104,6 @@ function retreiveSavedTweetData() {
   });
 }
 
-//function to retrieve locations
 function retreiveSavedLocationData() {
   var locationRef = fireb.child('users').child(currentUser.id).child('location');
 
