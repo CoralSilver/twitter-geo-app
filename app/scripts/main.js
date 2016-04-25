@@ -59,8 +59,7 @@ function initMap(position) {
 
   var $showTweetsButton = $('#show-tweets-button');
   $showTweetsButton.removeAttr('disabled');
-
-  $(document).on('click', $showTweetsButton, function() {
+  $showTweetsButton.on('click', function() {
    geocodeLatLng(geocoder, map, infowindow);
    buildResults(latitude, longitude);
    $('#save-location-icon').removeClass('hidden');
@@ -130,7 +129,6 @@ function getTweetsByLocation(lat, lon, miles){
       parseTweetData(status, $locatedTweets, false);
     })
 
-    console.log('tweet', data.statuses);
   }).fail(function(err) {
     console.warn(err);
   });
